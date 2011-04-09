@@ -1,0 +1,120 @@
+# [true/false] Does the map wrap around? (i.e. far left side plays far right side as neighbor)
+infinite map = true
+
+# [true/false] Use a predefined map of strategies? If false, strategies will be randomly assigned
+predefined map = false
+
+# [integer] Size of grid, in number of cells
+grid width = 10
+grid height = 10
+
+# [integer] Graphical size of individual cells, in pixels
+cell width = 20
+cell height = 20
+
+# [integer] determines how quickly the simulation runs
+rounds per second = 2
+
+# [integer] PD game payoffs
+both cooperate payoff = 3
+both defect payoff = 2
+suckers payoff = 1
+cheaters payoff = 5
+
+# [integer] the threshold for a cell to capture another; i.e. Cell A must have this many more points than Cell B to capture and convert Cell B
+capture threshold = 10
+
+# [retain/reset/copy] sets behavior for determining a captured cell's score immediately after capture:
+#    retain = keep same score as before capture
+#    reset = sets score to zero
+#    copy = copy's the capturing cell's score over its own
+captured cell score = reset
+
+# strategy specific parameters
+
+# [percent] how often TFT Forgiving allows a defect to go unpunished (i.e. 40 means 40% of the time, it goes unpunished)
+tftforgiving threshold = 10
+
+# [percent] how often TFT Probing attempts to exploit cooperating opponent
+tftprobing threshold = 10
+
+# [percent] how often TFT Random flips its response (i.e. would have defected, but cooperates instead)
+tftrandom threshold = 10
+
+
+
+
+
+
+#####     CONFIG.TXT (HOW TO USE THIS FILE)     #####
+#
+#	This is a configuration file used to set up the parameters of the simulation.
+#	Any lines beginning with a "#" are ignored. All other lines must be definitions, i.e.:
+#
+#		some value name = 42
+#
+#	Spaces are allowed in the value names. Each line has a comment above it describing the
+#	particular effect of the following configuration setting. Be sure to follow the
+#	input restrictions in the [brackets], i.e.:
+#
+#		# [integer] only integer values are allowed for this setting
+#		foo bar = 42
+#
+#   [integer] - any whole number
+#   [percent] - a percentage number between 1 and 100, do not include the "%" sign!
+#	[optionA/optionB/...] - options, choose any one listed. Be sure to type it exactly as show - spaces, captialization, punctuation, everything
+#
+#	You can add definitions here in any order.
+#
+#	While the entire simulator is released open source (see license.txt), this configuration
+#	file is meant to allow non-programmers to experiment with the simulator. If you do make
+#	any changes to the simulator such as adding parameters, it would be nice to make those
+#	parameters loadable from this configuration file so that future non-programmers can use
+#	it still.
+#
+#	Below are some basic descriptions of the mechanics of the simulator, and how some of
+#	the above settings alter the behavior.
+#
+#####
+
+
+
+#####     BASIC PLAY     #####
+#
+#	Playing partners are the 4 adjacent neighbors in cardinal directions only
+#	Cell 5 will play against cells 2, 4, 6, and 8, but not against 1, 3, 7, and 9
+#	If the "infinite map" setting is turned on, the map will "wrap around"
+#		i.e. cell 6 will play against cell 4 (along with 5, 3, and 9)
+#
+#
+#		 _ _ _ 		 _ _ _ 		 _ _ _
+#		|	  |		|	  |		|	  |
+#		|  1  |	 -	|  2  |	 -	|  3  |
+#		|_ _ _|		|_ _ _|		|_ _ _|
+#
+#		   |		   |		   |
+#		 _ _ _ 		 _ _ _ 		 _ _ _
+#		|	  |		|	  |		|	  |
+#		|  4  |	 -	|  5  |	 -	|  6  |
+#		|_ _ _|		|_ _ _|		|_ _ _|
+#
+#		   |		   |		   |
+#		 _ _ _ 		 _ _ _ 		 _ _ _
+#		|	  |		|	  |		|	  |
+#		|  7  |	 -	|  8  |	 -	|  9  |
+#		|_ _ _|		|_ _ _|		|_ _ _|
+#
+#####
+
+
+
+#####     CAPTURE     #####
+#
+#	A cell is captured when the score of its neighboring cell is greater than its
+#	own score by the "capture threshold" amount. Lowering this number makes it easier
+#	for strategies to win against others, and increasing it makes it more difficult.
+#	If, in the same round, two or more neighbors gain more than the capture threshold,
+#	and thus become eligible to capture the same cell, the neighboring cell with the
+#	higher total score captures.
+#
+#####
