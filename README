@@ -4,12 +4,15 @@ A framework for simulating a geospatial iterated Prisoner's Dilemma. The package
 **** Configuration ****
 
 The simulator comes packaged with a text file named config.txt. This file is used to adjust the configurable parameters of the simulation. For a detailed list of each parameter and its available settings, see Appendix A. This section explains how to use the configuration file, as well as a more in depth examination of a few key settings.
+
 The configuration file is setup as a series of statements. Any line with the first character of # will be ignored; these are comment lines, intended to provide helpful guidance on each parameter. Most statements are preceded by a comment line indicating the acceptable values and a brief description. For example,
 
   # [integer] Sets how wide the map is, in number of cells grid width = 20
 
 would set the parameter grid width to a value of 20. The beginning of the comment line features a bracketed term, [integer] in this case, describing the acceptable values for the parameter. Acceptable values need not be numbers; for example, the captured cell score parameter takes one of three values, retain, reset, or copy.
+
 A few parameters warrant a deeper explanation that the configuration file’s comment lines or the Appendix provide, the first being infinite map. Because of the inherent limitations, both theoretical and practical, a truly infinite map of cells in all directions is impossible. Yet this opens the possibility of altering the results of the simulation: edge or corner cells would only play three or two neighbors, respectively, instead of the normal four. While this may produce interesting effects, the infinite map setting provides a workaround to ensure all cells play four neighbors. When set to true, cells on the eastern edge of the map play cells on the western edge of the map as if the western edge cells were actually to the east. The same goes for the northern and southern edges. This allows all cells to play four neighbors and produces some interesting effects  as discussed later.
+
 The second parameter worth discussing is the predefined map parameter. When set to true, this overrides the default random assignment of strategies to cells, and instead loads a predefined map of strategies. The map is stored in map.txt, and the format is simple: each line of the text file corresponds to one row on the map. Columns are separated by spaces, and strategies are indicated by their ID numbers (see Appendix B for a complete list of strategies with their respective ID numbers). This allows for more controlled testing of various situations, and is very useful for debugging the implementation of new strategies. By pitting the new strategy against a simple one like ALLCOOPERATE, the behavior of the new strategy can easily be observed for any abnormalities.
 
 
@@ -17,7 +20,9 @@ The second parameter worth discussing is the predefined map parameter. When set 
 **** Running the Simulation ****
 
 Once the configuration file is setup, the simulator is ready to run. Once launched, the simulator displays the map in its current state, along with several other areas of information and controls.
+
 Three main areas provide information about the current state of the map. First is the active cell display: always visible to the top right of the map, this displays the score and strategy of the “active cell”. Highlighted in a white border, the active cell can be changed by clicking on any other cell. The second area is the cursor cell. When the user’s cursor hovers over a cell on the map, it is highlighted with a white border, and its strategy and score appear below the active cell’s information. This is useful to compare scores between neighboring cells and monitor gameplay. Finally, below the map appears a listing of all the strategies used. Hovering the mouse over any strategy will highlight all the cells on the map using that strategy. This is useful to identify which colors belong to which strategies, en masse.
+
 In addition to informative displays, the simulator offers two buttons to control the simulation, “Play/Paused” and “Play Next Round”. Play Next Round plays one round only, and stays paused afterward.
 
 
@@ -25,8 +30,11 @@ In addition to informative displays, the simulator offers two buttons to control
 **** Recording the Results ****
 
 Having reached a satisfactory end-state for the simulation, the final task to record the data generated. Recording is necessary because of the randomness of some of the strategies implemented. If no strategies relied on randomness, then the results of the simulation would be deterministic, and only the starting parameters need be recorded to produce the exact same results. But due to the element of randomness, the same starting parameters could produce two wildly different outcomes, making recording necessary.
+
 There are two formats for saving simulations, text and video. Both automatically start recording when the simulation starts, and are saved in the same folder as the simulator itself. The user can force recording to stop and flush any saved data to the hard drive by pressing “s” for the text recording and “m” for the video recording. If the user doesn’t do this, the files will automatically be saved on exit.
+
 The text recording stores two things for each round of the game: the strategy ID and the total score of each cell. It stores it in the same formatting style of the predefined map file, with each line representing a row, and columns separated by spaces.
+
 The video record stores one frame per round to save on file size. Every five minutes it automatically creates a new video file. This is a technical limitation to avoid storing large amounts of data in memory. These video files are useful for understanding the overall path of the simulation, while the text saves allow for a highly detailed statistical analysis.
 
 
@@ -34,7 +42,9 @@ The video record stores one frame per round to save on file size. Every five min
 **** Choosing a Platform ****
 
 The objective in constructing the simulator was to create an extensible system that was highly configurable as well as easy to understand. Initially, I began development using a toolset published by Microsoft for creating and deploying executables to their XBOX 360 gaming platform. Primarily targeting a gaming market, the toolset offered an attractive option because of the raw dedicated horsepower present on the XBOX hardware platform. Unlike desktop computers, these gaming platforms do not need to run otherwise uneccessary extraneous programs or services. They are tuned for high performance, and this advantage would allow for large experimental datasets; simulations could be run on larger populations for longer periods of time.
+
 After developing much of the simulation framework, I slowly realized the limitations of the XBOX as an academic development platform. The difficulty of accomplishing otherwise trivial tasks for a desktop program, such as writing save data to the hard drive, forced me to spend more energy on circumventing these restrictions than actually developing the simulator. Furthermore, the closed nature of the XBOX platform made possibility of customization, extension, and configuration very difficult to realize.
+
 Facing these obstacles, I decided to switch platforms to a new toolset called Processing. It is an open source toolset based on the widely popular Java programming language. The open source nature of the toolset allowed easy academic release; anyone can download the programming environment, and the more complicated aspects of the Java language are masked by Processing’s libraries. In return for this gain in flexibility and openness, some performance was sacrificed. Rather than focusing on the large datasets, my vision shifted to understanding the effects of the geospatial element, as well as the numerous adjustable parameters of the model itself, via an emphasis on anecdotal insights rather than statistical evidence.
 
 
@@ -50,7 +60,9 @@ The cellular automata structure of the simulation lends itself naturally to bein
   ]
 
 Each array is enclosed with square brackets ([]). Each row is an array storing three data values (integers, in this case). Each row, in turn, is stored in the containing array as a data value itself. Any individual data value can be referenced using notation similar to a standard Euclidean coordinate system, but with the coordinates reversed: [2][3] would give a value of 6.
+
 Each round, the simulator walks down each row and column in this two-dimensional array, and plays it against the next neighbor in line. This avoids the possibility of a pair of cells playing each other multiple times per round.
+
 The history of moves for each cell is stored as a string (text) in an array within the cell itself. When cells request the history of moves for use in their decision algorithms, they can identify moves based on the first token of the string stored in history, “defect” or “cooperate”. The second token is the payoff received as a result of that move. Whenever a cell is captured, the history is cleared to prevent the decisions of the previous strategy from impacting the new one.
 
 
@@ -58,6 +70,7 @@ The history of moves for each cell is stored as a string (text) in an array with
 **** Implementing New Strategies ****
 
 For advanced users fluent in Java programming, adding additional, custom strategies is relatively easy. Strategies are implemented as separate functions. To create a new strategy named My Strategy, create a function named MyStrategy at the end of the source code file. Each strategy function is passed two arguments: the cell playing, and the opponent played against. The arguments are instances of the Cell class. To prevent the confusion of the two identically typed arguments, each strategy function usually names the incoming arguments me and him, respectively. A strategy’s choice is indicated by returning a boolean value, true for cooperation and false for defection.
+
 To implement this new strategy function, a few additions must be made to the code beyond just the strategy function itself. First, under the play_pair function, add the new function to the two switch statements, following the format of the other cases. Next, under the strategy_color function, add one to the divisor in the int h definition. Under the init_cell function, add one to the upper bound of the random function. Finally, add the strategy’s display name to the end of the strategy_names global variable.
 
 
@@ -65,6 +78,7 @@ To implement this new strategy function, a few additions must be made to the cod
 **** Accessing Cell Information ****
 
 To retrieve the history of moves of the opponent, simply call him.get_history_with(me), which returns an ArrayList of the opponents moves against you. To retrieve your own history of moves against the opponent cell, reverse the order by calling me.get_history_with(him). Each element in the returned ArrayList represents a move, and is stored as a string of tokens. See the previous section for a description of the history string structure.
+
 In addition to the history, strategy functions can store arbitrary data in the cell with HashMap data. This allows strategies a cheaper way to remember stateful behavior than reanalyzing the entire history each round. Strategies like Punisher use this to maintain a punishing state for a set number of moves.
 
 
@@ -72,6 +86,7 @@ In addition to the history, strategy functions can store arbitrary data in the c
 **** Notes About Edge Cases and Debugging ****
 
 It is important to consider all possible edge cases, especially those scenarios involving early round moves. Several strategies such as TIT FOR TAT or PAVLOV require at least one move of history to make their decisions, yet the first round of the game provides no such history. An easy check for an edge case such as this is to check the size of the ArrayList returned by the get_history_with method. A size of zero indicates this is the first moves these two cells are taking against each other.
+
 In addition, observant users will have noticed a dormant strategy in the source code named “User Controlled”. This is an effective tool for debugging new strategies to ensure the function as expected. Create a simulation with a predefined map of 2 x 1, with one cell adopting the custom strategy and the other adopting User Controlled. Pressing the “d” key with the User Controlled cell selected will cause it to defect the next round. Otherwise, User Controlled always cooperates. This allows for easy testing of the behavior of individual strategies.
 
 
